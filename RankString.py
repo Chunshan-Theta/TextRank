@@ -1,27 +1,26 @@
 # coding:utf-8
 import numpy as np
 import sys
-sys.path.append('./jieba_tw/')
+sys.path.append('./jieba_zn/')
 import jieba
 import logging
 jieba.setLogLevel(10)
 
 
-
-seg_list = jieba.cut("要求賴院長提出礦業法修法時程",cut_all=False)
-
-
-
+#美國一名獨居男子經常光顧當地的披薩店而日前突然在家發病他萬萬沒有想到自己的救命恩人就是自己平常叫外送的披薩店店長
+seg_list = jieba.cut("美国一名独居男子经常光顾当地披萨店日前突然在家发病他万万没有想到自己救命恩人就是自己平常叫外送披萨店店长",cut_all=False)
+#seg_list = jieba.cut("美國一名獨居男子經常光顧當地披薩店日前突然在家發病他萬萬沒有想到自己救命恩人就是自己平常叫外送披薩店店長",cut_all=True)
+#seg_list = jieba.cut_for_search("美国一名独居男子经常光顾当地披萨店日前突然在家发病他万万没有想到自己救命恩人就是自己平常叫外送披萨店店长")
 Text_Array =[]
 Text_Node =[]
 Text_Node_Connection = []
-
+Get_Top_Num = 10
 for i in seg_list:
     Text_Array.append(i)
 print '/'.join(Text_Array)
 
 
-WindowsSize = 3
+WindowsSize = 5
 for i in range(len(Text_Array)):
     if Text_Array[i] not in Text_Node:
         Text_Node.append(Text_Array[i])
@@ -74,12 +73,19 @@ for Train_Time in range(10):
         for j in range(len(Text_Node_Connection_weight[i])):
             Score+= d*float(Text_Node_Connection_weight[i][j])*Text_Node_value[i]/float(sum(Text_Node_Connection_weight[j]))
         Text_Node_value[i] = Score
-    print Text_Node_value
+    #print Text_Node_value
 #print Text_Node_value.argsort()[-1*Get_Top_Num:][::-1]
-Get_Top_Num = int(len(Text_Node)/3)
 
-for i in Text_Node_value.argsort()[-1*Get_Top_Num:][::-1]:
-    print Text_Node[i]
+#TopText = np.sort(Text_Node_value.argsort()[-1*Get_Top_Num:], axis=None) 
+TopText = Text_Node_value.argsort()[-1*Get_Top_Num:][::-1]
+for i in TopText:
+    print i,Text_Node[i],Text_Node_value[i]
 
+from jieba import analyse
 
+# 基于TextRank算法进行关键词抽取
+keywords = analyse.textrank("美国一名独居男子经常光顾当地披萨店日前突然在家发病他万万没有想到自己救命恩人就是自己平常叫外送披萨店店长")
+# 输出抽取出的关键词
+for keyword in keywords:
+    print keyword + "/",
 
