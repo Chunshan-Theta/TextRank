@@ -1,5 +1,6 @@
 # coding:utf-8
 import json 
+import numpy as np
 def filter(source_text_array):
     filtered_text_array = []
     f = open('stop_words.txt','r')
@@ -19,8 +20,15 @@ def update():
     f = open('train_data','r')
     new = open('stop_words.txt','aw')
     Json_Array = json.loads(f.read())
+    Json_value_Array = [int(i) for i in Json_Array.values()]
+    q75, q25 = np.percentile(Json_value_Array, [75 ,25])
+    iqr = q75 - q25
+    print q75+iqr*1.5, q25-iqr*1.5
     for key, value in Json_Array.items():
-        new.write(key.encode('utf-8')+'\n')
+        if int(value)<q75+iqr*1.5 and int(value)>q25-iqr*1.5:
+            new.write(key.encode('utf-8')+'\n')
+        else:
+            print key
     new.close()
 
 def drop_repeat():
