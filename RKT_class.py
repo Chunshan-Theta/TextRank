@@ -1,3 +1,4 @@
+# coding:utf-8
 import numpy as np
 class RKT:
     def __init__(self,Text_Array):
