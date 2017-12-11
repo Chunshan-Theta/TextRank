@@ -1,6 +1,10 @@
 # coding:utf-8
 import json 
 import numpy as np
+import sys
+sys.path.append('./jieba_zn/')
+import jieba
+jieba.setLogLevel(60)
 def filter(source_text_array):
     filtered_text_array = []
     f = open('stop_words.txt','r')
@@ -12,23 +16,29 @@ def filter(source_text_array):
         #print source_text_array[i]
         if not source_text_array[i].encode('utf-8') in Stop_Words_Array :
             filtered_text_array.append(source_text_array[i])
+        else:
+            print 'Stop_Words: ',source_text_array[i]
     f.close()
     return filtered_text_array
 
 
 def update():
     f = open('train_data','r')
-    new = open('stop_words.txt','aw')
+    new = open('stop_words.txt','wa')
     Json_Array = json.loads(f.read())
     Json_value_Array = [int(i) for i in Json_Array.values()]
     q75, q25 = np.percentile(Json_value_Array, [75 ,25])
     iqr = q75 - q25
     print q75+iqr*1.5, q25-iqr*1.5
     for key, value in Json_Array.items():
-        if int(value)<q75+iqr*1.5 and int(value)>q25-iqr*1.5:
+        if int(value)>q75+iqr*1.5 or int(value)<q25-iqr*1.5:
             new.write(key.encode('utf-8')+'\n')
         else:
-            print key
+            pass
+            #print key
+    stop_words_default=["「","」","，","！"]
+    for i in stop_words_default:
+        new.write(i+'\n')
     new.close()
 
 def drop_repeat():
@@ -46,13 +56,10 @@ def drop_repeat():
 
 
 
-def train():
-    import sys
-    sys.path.append('./jieba_zn/')
-    import jieba
-    
+def train(data_file_name):
 
-    f = open('doc/data.txt','r')
+    print 'doc/waitfortrain/'+str(data_file_name)+'.txt'
+    f = open('doc/waitfortrain/'+str(data_file_name)+'.txt','r')
     seg_list = jieba.lcut(f.read(),cut_all=False)
     #print seg_list
     doc={}
@@ -61,7 +68,7 @@ def train():
             doc.update({i.encode('utf-8'):"1"})
         else:
             if i.encode('utf-8') != '\n' and  i.encode('utf-8') != '':
-                doc[i.encode('utf-8')] = str(int(doc[i.encode('utf-8')])+1)
+                doc[i.encode('utf-8')] = str(int(doc[i.encode('utf-8')])+1).rstrip()
 
 
 
@@ -112,8 +119,12 @@ print filter(a)
 update()
 drop_repeat()
 '''
-train()
+
+for i in range(1,151):
+    train(i)
+
 update()
 drop_repeat()
+
 
 

@@ -5,9 +5,9 @@ import time
 import csv
 
 
-def crawler(news_url,history_crawler):
+def crawler(site_root,news_url,history_crawler):
     file_name = str(len(history_crawler)+1)
-    Page = rq.get("https://tw.news.appledaily.com"+news_url)#目標網佔
+    Page = rq.get(site_root+news_url)#目標網佔
     content = Page.content
     content_start = Page.content.index('<div class="ndArticle_margin">')
     content_End = Page.content.index('<div id="fb-root"')
@@ -48,30 +48,35 @@ def crawler(news_url,history_crawler):
     f = open("history.txt",'a')
     f.write(news_url+'\n')
     f.close()
-    history_crawler.append(str(news_url+'\n'))
+    history_crawler.append(str(site_root+news_url+'\n'))
 
     content = Page.content
     content_start = content.index('ndArticle_pageNext')
     content = content[content_start:content_start+500]
-    content_start = content.index('<a href="/headline/daily/')
+    content_start = content.index('<a href="')
     content = content[content_start:content_start+50]
+    content_start = content.index('/daily/')
     content_end = content.index('>')
-    new_url = content[len('<a href="'):content_end-1]
+    new_url = content[content_start:content_end-1]
     #print content[content_start:content_end]
 
    
     
-    if new_url+'\n' not in history_crawler:
+    if site_root+new_url+'\n' not in history_crawler:
         try:
-            print new_url
-            crawler(new_url,history_crawler)
-        except Exception as e:
-            print e
+            print site_root+new_url
+            crawler(site_root,new_url,history_crawler)
+        except ValueError as e:
+            print 'NODE END'
     else:
         print new_url+' the url is in history_crawler.txt'
 f = open("history.txt",'r')
 history_crawler=f.readlines()
 #print history_crawler
 f.close()
-crawler('/headline/daily/20171205/37864478/',history_crawler)
+#crawler("https://tw.news.appledaily.com/headline",'/daily/20171203/37863184/',history_crawler)
+#crawler("https://tw.entertainment.appledaily.com",'/daily/20171203/37862980/',history_crawler)
+#crawler("https://tw.sports.appledaily.com",'/daily/20171203/37862844/',history_crawler)
+#crawler("https://tw.finance.appledaily.com",'/daily/20171203/37863273/',history_crawler)
+crawler("https://tw.lifestyle.appledaily.com",'/daily/20171203/37862657/',history_crawler)
    
