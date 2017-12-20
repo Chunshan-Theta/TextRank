@@ -34,7 +34,7 @@ def update():
     iqr = q75 - q25
     #d2= q75+iqr*1.5
     #d1= q25-iqr*1.5
-    d2, d1 = np.percentile(Json_value_Array, [99 ,1])
+    d2, d1 = np.percentile(Json_value_Array, [98.04 ,1.96])
     print d2,'-',d1
     for key, value in Json_Array.items():
         #print len(key)
@@ -128,9 +128,9 @@ def train(data_file_name):
 
 for i in range(1,291):
     train(i)
-update()
-'''
 
+'''
+update()
 
 
 
