@@ -1,19 +1,20 @@
 # coding:utf-8
 import numpy as np
+
 class RKT:
-    def __init__(self,Text_Array):
+    def __init__(self,Text_Array,Get_Top = 15):
         self.Text_Array = Text_Array
         self.Text_Node,self.Text_Node_Connection = self.build_node_diagram(Text_Array)
         self.Text_Node_Connection_weight = np.zeros((len(self.Text_Node), len(self.Text_Node)),int)
         self.Text_Node_value = np.arange(float(len(self.Text_Node)))
-        self.Train_Time = 10
+        self.Train_Time = 5
         for i in range(len(self.Text_Node_value)):
             self.Text_Node_value[i]=1
         self.calculate_connect_weight()
         self.calculate_score()
-        self.Get_Top_Num = 15 
+        self.Get_Top_Num = Get_Top 
         self.TopText = np.sort(self.Text_Node_value.argsort()[-1*self.Get_Top_Num:], axis=None) 
-        #self.TopText = Text_Node_value.argsort()[-1*Get_Top_Num:][::-1]
+        self.TopText_H2L = self.Text_Node_value.argsort()[-1*self.Get_Top_Num:][::-1]    #Scorc high to low
         
 
 

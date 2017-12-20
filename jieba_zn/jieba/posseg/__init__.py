@@ -104,9 +104,8 @@ class POSTokenizer(object):
                     continue
                 word, _, tag = line.split(" ")
                 self.word_tag_tab[word] = tag
-            except Exception:
-                raise ValueError(
-                    'invalid POS dictionary entry in %s at Line %s: %s' % (f_name, lineno, line))
+            except ValueError as e:
+                print 'ValueError: ',e
         f.close()
 
     def makesure_userdict_loaded(self):

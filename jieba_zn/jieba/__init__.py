@@ -23,7 +23,7 @@ else:
 _get_abs_path = lambda path: os.path.normpath(os.path.join(os.getcwd(), path))
 
 DEFAULT_DICT = None
-DEFAULT_DICT_NAME = "dict.txt"
+DEFAULT_DICT_NAME = "dict.trad.txt"
 
 log_console = logging.StreamHandler(sys.stderr)
 default_logger = logging.getLogger(__name__)
@@ -511,6 +511,7 @@ lcut_for_search = dt.lcut_for_search
 del_word = dt.del_word
 get_DAG = dt.get_DAG
 get_dict_file = dt.get_dict_file
+dt.load_userdict(get_module_res('dict.txt.tw'))
 initialize = dt.initialize
 load_userdict = dt.load_userdict
 set_dictionary = dt.set_dictionary

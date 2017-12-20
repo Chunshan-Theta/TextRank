@@ -5,7 +5,8 @@ import sys
 sys.path.append('./jieba_zn/')
 import jieba
 jieba.setLogLevel(60)
-def filter(source_text_array):
+
+def filter(source_text_array,textlenlimit=1):
     filtered_text_array = []
     f = open('stop_words.txt','r')
     Stop_Words_Array=f.readlines()
@@ -15,7 +16,8 @@ def filter(source_text_array):
     for i in range(len(source_text_array)):
         #print source_text_array[i]
         if not source_text_array[i].encode('utf-8') in Stop_Words_Array :
-            filtered_text_array.append(source_text_array[i])
+            if len(source_text_array[i])>textlenlimit:
+                filtered_text_array.append(source_text_array[i])
         else:
             print 'Stop_Words: ',source_text_array[i]
     f.close()
@@ -23,15 +25,20 @@ def filter(source_text_array):
 
 
 def update():
+    
     f = open('train_data','r')
     new = open('stop_words.txt','wa')
     Json_Array = json.loads(f.read())
     Json_value_Array = [int(i) for i in Json_Array.values()]
     q75, q25 = np.percentile(Json_value_Array, [75 ,25])
     iqr = q75 - q25
-    print q75+iqr*1.5, q25-iqr*1.5
+    #d2= q75+iqr*1.5
+    #d1= q25-iqr*1.5
+    d2, d1 = np.percentile(Json_value_Array, [99 ,1])
+    print d2,'-',d1
     for key, value in Json_Array.items():
-        if int(value)>q75+iqr*1.5 or int(value)<q25-iqr*1.5:
+        #print len(key)
+        if int(value)>d2 or int(value)<d1:
             new.write(key.encode('utf-8')+'\n')
         else:
             pass
@@ -40,8 +47,10 @@ def update():
     for i in stop_words_default:
         new.write(i+'\n')
     new.close()
+    drop_repeat()
 
 def drop_repeat():
+    print("drop repeat text.....")
     f = open('stop_words.txt','r')
     Stop_Words_Array_in_txt = f.readlines()
     f.close()
@@ -68,7 +77,7 @@ def train(data_file_name):
             doc.update({i.encode('utf-8'):"1"})
         else:
             if i.encode('utf-8') != '\n' and  i.encode('utf-8') != '':
-                doc[i.encode('utf-8')] = str(int(doc[i.encode('utf-8')])+1).rstrip()
+                doc[i.encode('utf-8')] = str(int(doc[i.encode('utf-8')])+1).strip()
 
 
 
@@ -78,7 +87,10 @@ def train(data_file_name):
     
     
     json_data = open('train_data','r')
-    Json_Array = json.loads(json_data.read(),encoding="utf-8")
+    try:
+        Json_Array = json.loads(json_data.read(),encoding="utf-8")
+    except ValueError:
+        print 'ValueError: error in your train data,maybe is a \'tap\' or likes word.'
     json_data.close()
     new_data ={}
     Json_Array_new = {}
@@ -106,25 +118,19 @@ def train(data_file_name):
         nkv = '"'+key+'":"'+value+'",'
         json_data_string = json_data_string + nkv
     json_data_string = json_data_string[:len(json_data_string)-1]+'}'
-
     json_data = open('train_data','w')
     json_data.write(json_data_string)
     json_data.close()    
     f.close()
     
-
-'''
-a=['the', 'of', 'is','test','qweqwe','wwwwertt','isisisi']
-print filter(a)
-update()
-drop_repeat()
 '''
 
-for i in range(1,151):
+
+for i in range(1,291):
     train(i)
-
 update()
-drop_repeat()
+'''
+
 
 
 
