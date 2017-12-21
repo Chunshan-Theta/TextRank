@@ -18,8 +18,8 @@ def filter(source_text_array,textlenlimit=1):
         if not source_text_array[i].encode('utf-8') in Stop_Words_Array :
             if len(source_text_array[i])>textlenlimit:
                 filtered_text_array.append(source_text_array[i])
-        else:
-            print 'Stop_Words: ',source_text_array[i]
+        else:            
+            jieba.Write_Log_Debug('Stop_Words: '+source_text_array[i].encode("utf-8"))
     f.close()
     return filtered_text_array
 

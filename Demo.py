@@ -15,6 +15,7 @@ seg_list = jieba.lcut(SourceText,cut_all=False)
 seg_list = sw.filter(seg_list)
 a = RKT(seg_list,20)
 print SourceText
+for i in seg_list:print i,'/',
 print "\nTheta , keywords by textrank:"
 #for i in a.Text_Array:print i
 #for i in a.Text_Node_value:print i
